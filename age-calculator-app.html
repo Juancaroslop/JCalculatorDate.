@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JCalculatorDate</title>
+  <style>
+      :root {
+          --primary-color: #2c3e50;
+          --secondary-color: #3498db;
+          --background-color: #ecf0f1;
+          --card-background: #ffffff;
+          --text-color: #333;
+      }
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: var(--background-color);
+          color: var(--text-color);
+          line-height: 1.6;
+      }
+
+      .container {
+          width: 100%;
+          max-width: 800px;
+          margin: 2rem auto;
+          padding: 2rem;
+          background-color: var(--card-background);
+          border-radius: 12px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      }
+
+      .header {
+          text-align: center;
+          margin-bottom: 2rem;
+          color: var(--primary-color);
+      }
+
+      .logo {
+          width: 50px; /* Ajusta el tamaño según sea necesario */
+          height: 50px; /* Mantén la altura igual a la anchura para que sea circular */
+          border-radius: 50%; /* Hace que la imagen sea redonda */
+          object-fit: cover; /* Asegura que la imagen se ajuste dentro del círculo */
+          margin-right: 10px; /* Espacio entre el logo y el texto */
+          vertical-align: middle; /* Alineación vertical */
+          cursor: pointer; /* Cambia el cursor al pasar sobre el logo */
+      }
+
+      .calculator-section {
+          background-color: #f9f9f9;
+          border-radius: 8px;
+          padding: 1.5rem;
+          margin-bottom: 1rem;
+          border: 1px solid #e1e1e1;
+      }
+
+      .form-group {
+          margin-bottom: 1rem;
+      }
+
+      .form-group label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+      }
+
+      .form-control {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 1rem;
+      }
+
+      .checkbox-group {
+          display: flex;
+          align-items: center;
+          margin-bottom: 1rem;
+      }
+
+      .checkbox-group input {
+          margin-right: 0.5rem;
+      }
+
+      .btn {
+          display: block;
+          width: 100%;
+          padding: 0.75rem;
+          background-color: var(--secondary-color);
+          color: white;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 1rem;
+          transition: background-color 0.3s ease;
+      }
+
+      .btn:hover {
+          background-color: #2980b9;
+      }
+
+      .result {
+          background-color: #f4f4f4;
+          border-left: 4px solid var(--secondary-color);
+          padding: 1rem;
+          margin-top: 1rem;
+          border-radius: 4px;
+      }
+
+      .error {
+          color: #e74c3c;
+          font-weight: 600;
+      }
+
+      .calculator-selector {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 1.5rem;
+          flex-wrap: wrap;
+      }
+
+      .calculator-selector button {
+          background: none;
+          border: none;
+          padding: 0.5rem 1rem;
+          margin: 0.25rem 0.5rem;
+          cursor: pointer;
+          font-weight: 600;
+          color: var(--primary-color);
+          border-bottom: 2px solid transparent;
+          transition: all 0.3s ease;
+      }
+
+      .calculator-selector button.active {
+          color: var(--secondary-color);
+          border-bottom-color: var(--secondary-color);
+      }
+
+      .calculator-content {
+          display: none;
+      }
+
+      .calculator-content.active {
+          display: block;
+      }
+
+      .additional-info {
+          margin-top: 1rem;
+          font-size: 0.9rem;
+          color: #666;
+      }
+
+      /* Estilos para el modal */
+      .modal {
+          display: none; /* Oculto por defecto */
+          position: fixed; /* Fijo */
+          z-index: 1; /* En la parte superior */
+          left: 0;
+          top: 0;
+          width: 100%; /* Ancho completo */
+          height: 100%; /* Alto completo */
+          overflow: auto; /* Habilita el desplazamiento si es necesario */
+          background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro */
+      }
+
+      .modal-content {
+          background-color: #fff;
+          margin: 15% auto; /* 15% desde la parte superior y centrado */
+          padding: 20px;
+          border: 1px solid #888;
+          width: 50%; /* Ancho del modal */
+          border-radius: 8px; /* Bordes redondeados */
+      }
+
+      .close {
+          color: #aaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+          color: black;
+          text-decoration: none;
+          cursor: pointer;
+      }
+  </style>
+</head>
+<body>
+  <div class="container">
+      <h1 class="header" onclick="showAppInfo()">
+         <img src="logo.JPG" alt="Logo" class="logo">
+          JCalculatorDate
+      </h1>
+      
+      <div class="calculator-selector">
+          <button onclick="switchCalculator('age-calculator')" class="active">Calcular Edad</button>
+          <button onclick="switchCalculator('birth-year-calculator')">Calcular Año de Nacimiento</button>
+          <button onclick="switchCalculator('zodiac-calculator')">Signo Zodiacal</button>
+      </div>
+
+      <div id="age-calculator" class="calculator-content active">
+          <div class="calculator-section">
+              <h2>Calcular Edad Detallada</h2>
+              <div class="form-group">
+                  <label for="birthDate">Fecha de Nacimiento</label>
+                  <input type="date" id="birthDate" class="form-control">
+              </div>
+              <div class="checkbox-group">
+                  <input type="checkbox" id="birthdayPassed" checked>
+                  <label for="birthdayPassed">¿Ya cumplió años este año?</label>
+              </div>
+              <button class="btn" onclick="calculateDetailedAge()">Calcular Edad</button>
+              <div id="ageResult" class="result"></div>
+              <div id="additionalAgeInfo" class="additional-info"></div>
+          </div>
+      </div>
+
+      <div id="birth-year-calculator" class="calculator-content">
+          <div class="calculator-section">
+              <h2>Calcular Año de Nacimiento</h2>
+              <div class="form-group">
+                  <label for="age">Edad</label>
+                  <input type="number" id="age" placeholder="Ingrese su edad" class="form-control">
+              </div>
+              <div class="form-group">
+                  <label for="currentYear">Año Actual</label>
+                  <input type="number" id="currentYear" placeholder="Ingrese el año actual" class="form-control">
+              </div>
+              <div class="checkbox-group">
+                  <input type="checkbox" id="ageBirthdayPassed" checked>
+                  <label for="ageBirthdayPassed">¿Ya cumplió años este año?</label>
+              </div>
+              <button class="btn" onclick="calculateBirthYear()">Calcular Año de Nacimiento</button>
+              <div id="birthYearResult" class="result"></div>
+              <div id="birthDateResult" class="additional-info"></div>
+          </div>
+      </div>
+
+      <div id="zodiac-calculator" class="calculator-content">
+          <div class="calculator-section">
+              <h2>Calculadora de Signo Zodiacal</h2>
+              <div class="form-group">
+                  <label for="zodiacBirthDate">Fecha de Nacimiento</label>
+                  <input type="date" id="zodiacBirthDate" class="form-control">
+              </div>
+              <button class="btn" onclick="calculateZodiacSign()">Calcular Signo</button>
+              <div id="zodiacResult" class="result"></div>
+              <div id="zodiacDescription" class="additional-info"></div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="infoModal" class="modal">
+      <div class="modal-content">
+          <span class="close" onclick="closeModal()">&times;</span>
+          <h2>Información de la Aplicación</h2>
+          <p><strong>Aplicación:</strong> JCalculatorDate</p>
+          <p><strong>Creador:</strong> JCharly_ls</p>
+          <p><strong>Descripción:</strong> Esta aplicación permite calcular la edad, el año de nacimiento y el signo zodiacal de una persona.</p>
+      </div>
+  </div>
+
+  <script>
+      const MONTHS = [
+          'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+      ];
+
+      const WEEKDAYS = [
+          'domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'
+      ];
+
+      const ZODIAC_SIGNS = [
+          {name: 'Capricornio', start: {month: 11, day: 22}, end: {month: 0, day: 19}, description: 'Ambicioso y disciplinado'},
+          {name: 'Acuario', start: {month: 0, day: 20}, end: {month: 1, day: 18}, description: 'Innovador e independiente'},
+          {name: 'Piscis', start: {month: 1, day: 19}, end: {month: 2, day: 20}, description: 'Sensible y creativo'},
+          {name: 'Aries', start: {month: 2, day: 21}, end: {month: 3, day: 19}, description: 'Valiente y enérgico'},
+          {name: 'Tauro', start: {month: 3, day: 20}, end: {month: 4, day: 20}, description: 'Estable y práctico'},
+          {name: 'Géminis', start: {month: 4, day: 21}, end: {month: 5, day: 20}, description: 'Comunicativo y adaptable'},
+          {name: 'Cáncer', start: {month: 5, day: 21}, end: {month: 6, day: 22}, description: 'Intuitivo y emocional'},
+          {name: 'Leo', start: {month: 6, day: 23}, end: {month: 7, day: 22}, description: 'Carismático y líder'},
+          {name: 'Virgo', start: {month: 7, day: 23}, end: {month: 8, day: 22}, description: 'Analítico y detallista'},
+          {name: 'Libra', start: {month: 8, day: 23}, end: {month: 9, day: 22}, description: 'Equilibrado y diplomático'},
+          {name: 'Escorpio', start: {month: 9, day: 23}, end: {month: 10, day: 21}, description: 'Intenso y apasionado'},
+          {name: 'Sagitario', start: {month: 10, day: 22}, end: {month: 11, day: 21}, description: 'Aventurero y optimista'}
+      ];
+
+      function calculateDetailedAge() {
+          const birthDate = new Date(document.getElementById('birthDate').value);
+          const today = new Date();
+          const birthdayPassed = document.getElementById('birthdayPassed').checked;
+          const resultElement = document.getElementById('ageResult');
+          const additionalInfoElement = document.getElementById('additionalAgeInfo');
+
+          if (!birthDate || isNaN(birthDate.getTime())) {
+              resultElement.innerHTML = '<div class="error">Por favor, selecciona una fecha válida.</div>';
+              return;
+          }
+
+          const birthDateWithoutTime = new Date(birthDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+          const todayWithoutTime = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+          let years = today.getFullYear() - birthDate.getFullYear();
+          let months = today.getMonth() - birthDate.getMonth();
+          let days = today.getDate() - birthDate.getDate();
+
+          if (days < 0) {
+              months--;
+              const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+              days += lastMonth.getDate();
+          }
+          if (months < 0) {
+              years--;
+              months += 12;
+          }
+
+          if (!birthdayPassed) {
+              years--;
+              months = 12 - Math.abs(months);
+              days = new Date(today.getFullYear() - 1, 11, 31).getDate() - birthDate.getDate() + today.getDate();
+          }
+
+          const totalMilliseconds = todayWithoutTime - birthDateWithoutTime;
+          const totalDays = Math.floor(totalMilliseconds / (1000 * 60 * 60 * 24));
+          const weeks = Math.floor(totalDays / 7);
+
+          resultElement.innerHTML = `
+              <strong>Edad Detallada:</strong> 
+              ${years} años, ${months} meses, y ${days} días
+          `;
+
+          const birthDayOfWeek = WEEKDAYS[(birthDate.getDay() + 1) % 7];
+          additionalInfoElement.innerHTML = `
+              <p>📅 Día de la semana de nacimiento: ${birthDayOfWeek}</p>
+              <p>🗓️ Total de días vividos: ${totalDays} días</p>
+              <p>⏳ Total de semanas vividas: ${weeks} semanas</p>
+          `;
+      }
+
+      function calculateBirthYear() {
+          const age = parseInt(document.getElementById('age').value);
+          const currentYear = parseInt(document.getElementById('currentYear').value);
+          const birthdayPassed = document.getElementById('ageBirthdayPassed').checked;
+          const resultElement = document.getElementById('birthYearResult');
+          const birthDateResultElement = document.getElementById('birthDateResult');
+
+          if (isNaN(age) || isNaN(currentYear) || age < 0 || currentYear < 0) {
+              resultElement.innerHTML = '<div class="error">Por favor, ingrese números válidos.</div>';
+              return;
+          }
+
+          let birthYear = currentYear - age;
+          if (!birthdayPassed) {
+              birthYear--;
+          }
+
+          const birthMonth = 0; // enero
+          const birthDay = 1; // primer día
+
+          const birthDate = new Date(birthYear, birthMonth, birthDay);
+          birthDateResultElement.innerHTML = `<strong>Año de Nacimiento:</strong> ${birthYear}.`;
+
+          const today = new Date();
+          const detailedYears = today.getFullYear() - birthDate.getFullYear();
+          const detailedMonths = today.getMonth() - birthDate.getMonth();
+          const detailedDays = today.getDate() - birthDate.getDate();
+
+          let finalYears = detailedYears;
+          let finalMonths = detailedMonths;
+          let finalDays = detailedDays;
+
+          if (finalDays < 0) {
+              finalMonths--;
+              const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+              finalDays += lastMonth.getDate();
+          }
+          if (finalMonths < 0) {
+              finalYears--;
+              finalMonths += 12;
+          }
+
+          resultElement.innerHTML = `
+              <strong>Edad Detallada:</strong> 
+              ${finalYears} años, ${finalMonths} meses, y ${finalDays} días
+          `;
+      }
+
+      function calculateZodiacSign() {
+          const birthDate = new Date(document.getElementById('zodiacBirthDate').value);
+          const resultElement = document.getElementById('zodiacResult');
+          const descriptionElement = document.getElementById('zodiacDescription');
+
+          if (!birthDate || isNaN(birthDate.getTime())) {
+              resultElement.innerHTML = '<div class="error">Por favor, selecciona una fecha válida.</div>';
+              return;
+          }
+
+          const month = birthDate.getMonth();
+          const day = birthDate.getDate();
+
+          const zodiacSign = ZODIAC_SIGNS.find(sign => {
+              const startValid = (sign.start.month < sign.end.month) ?
+                  (month > sign.start.month || (month === sign.start.month && day >= sign.start.day)) &&
+                  (month < sign.end.month || (month === sign.end.month && day <= sign.end.day)) :
+                  (month > sign.start.month || (month === sign.start.month && day >= sign.start.day)) ||
+                  (month < sign.end.month || (month === sign.end.month && day <= sign.end.day));
+
+              return startValid;
+          });
+
+          if (zodiacSign) {
+              resultElement.innerHTML = `<strong>Tu Signo Zodiacal:</strong> ${zodiacSign.name}`;
+              descriptionElement.innerHTML = `<p>🌟 Descripción: ${zodiacSign.description}</p>`;
+          } else {
+              resultElement.innerHTML = '<div class="error">No se pudo determinar el signo zodiacal.</div>';
+          }
+      }
+
+      function switchCalculator(calculatorId) {
+          const calculators = document.querySelectorAll('.calculator-content');
+          calculators.forEach(calc => calc.classList.remove('active'));
+
+          const selectorButtons = document.querySelectorAll('.calculator-selector button');
+          selectorButtons.forEach(btn => btn.classList.remove('active'));
+
+          document.getElementById(calculatorId).classList.add('active');
+          const activeButton = Array.from(selectorButtons).find(btn => btn.textContent.includes(calculatorId.split('-')[0].replace('calculator', '')));
+          if (activeButton) {
+              activeButton.classList.add('active');
+          }
+      }
+
+      function showAppInfo() {
+          document.getElementById('infoModal').style.display = 'block';
+      }
+
+      function closeModal() {
+          document.getElementById('infoModal').style.display = 'none';
+      }
+
+      // Cerrar el modal si se hace clic fuera de él
+      window.onclick = function(event) {
+          const modal = document.getElementById('infoModal');
+          if (event.target === modal) {
+              closeModal();
+          }
+      }
+  </script>
+</body>
+</html>
